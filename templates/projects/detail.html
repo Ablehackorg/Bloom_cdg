@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.title }} - ImpactFund{% endblock %}
+{% block content %}
+
+<div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+  <!-- 🏷 Title & description -->
+  <h1 class="text-4xl font-extrabold text-gray-800 mb-2">{{ project.title }}</h1>
+  <p class="text-lg text-gray-600 mb-6 leading-relaxed">{{ project.description }}</p>
+
+  <!-- 🏷 Category & Region -->
+  <div class="flex flex-wrap gap-3 mb-6">
+    <span class="px-3 py-1 rounded-full text-sm font-medium
+      {% if project.category == 'health' %} bg-red-100 text-red-700
+      {% elif project.category == 'education' %} bg-blue-100 text-blue-700
+      {% elif project.category == 'environment' %} bg-green-100 text-green-700
+      {% elif project.category == 'innovation' %} bg-purple-100 text-purple-700
+      {% elif project.category == 'equality' %} bg-pink-100 text-pink-700
+      {% else %} bg-gray-200 text-gray-600 {% endif %}">
+      {{ project.get_category_display }}
+    </span>
+    <span class="px-3 py-1 rounded-full text-sm font-medium bg-cyan-100 text-cyan-700">
+      {{ project.get_region_display }}
+    </span>
+  </div>
+
+  <!-- 📊 Progress bar -->
+  <div class="mb-6">
+    <div class="flex justify-between text-sm font-medium mb-2">
+      <span class="text-green-600">${{ project.collected_amount }}</span>
+      <span class="text-gray-500">Goal: ${{ project.goal_amount }}</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+      <div class="{% if project.progress >= 100 %}bg-green-600
+                  {% elif project.progress >= 50 %}bg-yellow-500
+                  {% else %}bg-red-500{% endif %} h-3"
+           style="width: {{ project.progress }}%"></div>
+    </div>
+    <p class="text-sm text-gray-500 mt-1">Progress: {{ project.progress|floatformat:0 }}%</p>
+  </div>
+
+  <!-- 🎯 Action buttons -->
+  <div class="flex space-x-3 mt-6">
+    {% if can_donate %}
+      <button onclick="openModal('donateModal')"
+              class="flex-1 py-3 bg-cyan-600 text-white rounded-xl shadow hover:bg-cyan-700 transition">
+        💰 Donate
+      </button>
+    {% else %}
+      <button disabled
+              class="flex-1 py-3 bg-gray-400 text-white rounded-xl shadow cursor-not-allowed">
+        ✅ Goal Reached
+      </button>
+    {% endif %}
+
+    {% if has_applied %}
+      <button disabled
+              class="flex-1 py-3 bg-gray-400 text-white rounded-xl shadow cursor-not-allowed flex items-center justify-center gap-2">
+        ✔️ Already Applied
+      </button>
+    {% else %}
+      <button onclick="openModal('volunteerModal')"
+              class="flex-1 py-3 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition">
+        🙋 Apply as Volunteer
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- 🔙 Back -->
+  <div class="mt-8 text-center">
+    <a href="/"
+       class="inline-block px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+       ← Back to Home
+    </a>
+  </div>
+</div>
+
+<!-- 🪙 Donations -->
+<div class="bg-gray-50 rounded-xl shadow-inner p-6 max-w-4xl mx-auto mt-10">
+  <h2 class="text-2xl font-bold mb-4">Recent Donations</h2>
+  {% if project.donations.exists %}
+    <ul class="divide-y">
+      {% for d in project.donations.all %}
+      <li class="py-2 flex justify-between">
+        <span><b>{{ d.donor.username }}</b></span>
+        <span class="text-green-600 font-medium">+ ${{ d.amount }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-500">No donations yet.</p>
+  {% endif %}
+</div>
+
+<!-- 🤝 Volunteers -->
+<div class="bg-gray-50 rounded-xl shadow-inner p-6 max-w-4xl mx-auto mt-10">
+  <h2 class="text-2xl font-bold mb-4">Volunteer Applications</h2>
+  {% if project.volunteer_applications.exists %}
+    <ul class="divide-y">
+      {% for v in project.volunteer_applications.all %}
+      <li class="py-2">
+        <p><b>{{ v.volunteer.username }}</b>
+           <span class="ml-2 text-xs px-2 py-1 rounded-full
+             {% if v.status == 'pending' %} bg-yellow-100 text-yellow-700
+             {% elif v.status == 'approved' %} bg-green-100 text-green-700
+             {% else %} bg-red-100 text-red-700 {% endif %}">
+           {{ v.status|title }}</span>
+        </p>
+        <p class="text-gray-700 mt-1">{{ v.note }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-500">No volunteers yet.</p>
+  {% endif %}
+</div>
+
+<!-- 💰 Donate Modal -->
+<div id="donateModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+    <h2 class="text-2xl font-bold mb-4 text-cyan-700">Donate to {{ project.title }}</h2>
+    <input id="donationAmount" type="number" placeholder="Amount ($)"
+           class="w-full px-3 py-2 border rounded-lg mb-4">
+    <div class="flex justify-end space-x-2">
+      <button onclick="closeModal('donateModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+      <button onclick="donateProject({{ project.id }})"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🙋 Volunteer Modal -->
+<div id="volunteerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+    <h2 class="text-2xl font-bold mb-4 text-green-700">Apply as Volunteer</h2>
+    <textarea id="volunteerNote" placeholder="Why do you want to join?"
+              class="w-full px-3 py-2 border rounded-lg mb-4"></textarea>
+    <div class="flex justify-end space-x-2">
+      <button onclick="closeModal('volunteerModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+      <button onclick="applyVolunteer({{ project.id }})"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.remove("hidden"); }
+function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+async function donateProject(id) {
+  const amount = document.getElementById("donationAmount").value;
+  if (!amount || amount <= 0) { alert("Please enter a valid amount"); return; }
+  const res = await fetch(`/api/projects/${id}/donate/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+    body: JSON.stringify({ amount })
+  });
+  if (res.ok) { location.reload(); }
+  else { alert("Error donating"); }
+}
+
+async function applyVolunteer(id) {
+  const note = document.getElementById("volunteerNote").value;
+  const res = await fetch(`/api/projects/${id}/apply/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+    body: JSON.stringify({ note })
+  });
+  if (res.ok) { location.reload(); }
+  else { alert("Error applying"); }
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+{% endblock %}

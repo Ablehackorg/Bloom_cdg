@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - ImpactFund{% endblock %}
+{% block content %}
+
+<div class="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6">
+  <h1 class="text-2xl font-bold mb-4 text-center">Create an Account</h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block text-sm font-medium">Username</label>
+      <input type="text" name="username" required class="w-full px-3 py-2 border rounded-lg"/>
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Email</label>
+      <input type="email" name="email" required class="w-full px-3 py-2 border rounded-lg"/>
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Password</label>
+      <input type="password" name="password" required class="w-full px-3 py-2 border rounded-lg"/>
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Confirm Password</label>
+      <input type="password" name="confirm" required class="w-full px-3 py-2 border rounded-lg"/>
+    </div>
+
+    <!-- Role (faqat ikki tanlov) -->
+    <div>
+      <label class="block text-sm font-medium">Role</label>
+      <select name="role" class="w-full px-3 py-2 border rounded-lg">
+        <option value="volunteer">Volunteer</option>
+        <option value="investor">Investor</option>
+      </select>
+      <p class="text-xs text-gray-500 mt-1">
+        The Owners role is only granted by the administrator
+      </p>
+    </div>
+
+    <!-- Bio -->
+    <div>
+      <label class="block text-sm font-medium">Bio (optional)</label>
+      <textarea name="bio" rows="2" class="w-full px-3 py-2 border rounded-lg"></textarea>
+    </div>
+
+    <!-- Skills -->
+    <div>
+      <label class="block text-sm font-medium">Skills (optional)</label>
+      <textarea name="skills" rows="2" class="w-full px-3 py-2 border rounded-lg"></textarea>
+    </div>
+
+    <!-- Language -->
+    <div>
+      <label class="block text-sm font-medium">Language</label>
+      <select name="language" class="w-full px-3 py-2 border rounded-lg">
+        <option value="en">English</option>
+        <option value="uz">Uzbek</option>
+        <option value="ru">Russian</option>
+      </select>
+    </div>
+
+    <button type="submit" class="w-full py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
+      Sign Up
+    </button>
+  </form>
+
+  <p class="text-sm text-gray-600 mt-4 text-center">
+    Already have an account? <a href="/login/" class="text-cyan-600 hover:underline">Login</a>
+  </p>
+</div>
+
+{% endblock %}

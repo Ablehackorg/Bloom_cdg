@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-6">
+  <h1 class="text-2xl font-bold mb-6 text-center">My Profile</h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    {% for field in form %}
+      <div>
+        <label class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="text-sm text-red-500">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit"
+            class="w-full py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition">
+      Save Changes
+    </button>
+  </form>
+</div>
+{% endblock %}

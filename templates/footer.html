@@ -1,0 +1,118 @@
+{% load static %}
+
+<!-- Footer Area -->
+<footer id="footer_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-12 col-sm-12 col-12">
+                <div class="footer_area_about">
+                    <img src="{% static 'media/logo.png' %}" alt="Bloom">
+                    <p>Lorem ipsum dolor sit amet consec elit sed eiusmod tempor incididunt ut labore etdolore magna
+                        aliqua.</p>
+                    <h6><strong>Address:</strong> 858 Walnutwood Ave. Webster, NY 14580</h6>
+                    <h6><strong>Phone:</strong> <a href="tel:+998901234567">+998 90 123-45-67</a></h6>
+                    <h6><strong>Email:</strong> <a href="mailto:info@bloom.com">info@bloom.com</a></h6>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12 col-12">
+                <div class="footer_navitem_ara">
+                    <h3>Quick links</h3>
+                    <div class="nav_item_footer">
+                        <ul>
+                            <li><a href="/about/">About us</a></li>
+                            <li><a href="{% url 'project-list' %}">Projects</a></li>
+                            <li><a href="{% url 'groups' %}">Groups</a></li>
+                            <li><a href="/blogs/">Blog</a></li>
+                            <li><a href="/contact/">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12 col-12">
+                <div class="footer_navitem_ara">
+                    <h3>Support</h3>
+                    <div class="nav_item_footer">
+                        <ul>
+                            <li><a href="#help">Help & FAQ</a></li>
+                            <li><a href="{% url 'project-list' %}">Projects</a></li>
+                            <li><a href="{% url 'groups' %}">Community</a></li>
+                            <li><a href="/contact/">Contact us</a></li>
+                            <li><a href="#terms">Terms of service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 col-sm-12 col-12">
+                <div class="footer_navitem_ara">
+                    <h3>Latest updates</h3>
+                    <div class="footer_twitter_area">
+                        <a href="/blogs/" class="footer_twit_title">
+                            <i class="fab fa-twitter"></i> #bloom
+                        </a>
+                        <p>Stay connected with our latest updates and community activities. Follow us for inspiring stories of change!</p>
+                        <h6>{% now "F d, Y H:i" %}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Copyright Area -->
+<div class="copyright_area">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="copyright_left">
+                    <p>Copyright © {% now "Y" %} Bloom. All Rights Reserved</p>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="copyright_right">
+                    <ul>
+                        <li>
+                            <a href="#!" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        </li>
+                        <li>
+                            <a href="#!" aria-label="Twitter"><i class="fab fa-twitter-square"></i></a>
+                        </li>
+                        <li>
+                            <a href="#!" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        </li>
+                        <li>
+                            <a href="#!" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top To Bottom Area -->
+<div class="go-top">
+    <i class="fas fa-chevron-up"></i>
+    <i class="fas fa-chevron-up"></i>
+</div>
+
+<!-- JavaScript Files -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<!-- Bootstrap js -->
+<script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+<!-- Meanu js -->
+<script src="{% static 'js/jquery.meanmenu.js' %}"></script>
+<!-- Magnific Popup js -->
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<!-- owl carousel js -->
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<!-- wow.js -->
+<script src="{% static 'js/wow.min.js' %}"></script>
+<!-- waypoints.js -->
+<script src="{% static 'js/waypoints.min.js' %}"></script>
+<!-- counterup.js -->
+<script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+<!-- Custom js -->
+<script src="{% static 'js/custom.js' %}"></script>
+<script src="{% static 'js/custom-progress-bar.js' %}"></script>
+<script src="{% static 'js/custom-scroll-count.js' %}"></script>
+<script src="{% static 'js/video.js' %}"></script>

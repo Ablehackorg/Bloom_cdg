@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Title -->
+    <title>{% block title %}Bloom{% endblock %}</title>
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <!-- animate css -->
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}" />
+    <!-- Fontawesome css -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome.all.min.css' %}" />
+    <!-- owl.carousel css -->
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" />
+    <!-- owl.theme.default css -->
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}" />
+    <!-- Magnific popup css -->
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.min.css' %}" />
+    <!-- navber css -->
+    <link rel="stylesheet" href="{% static 'css/navber.css' %}" />
+    <!-- meanmenu css -->
+    <link rel="stylesheet" href="{% static 'css/meanmenu.css' %}" />
+    <!-- Style css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <!-- Responsive css -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'media/logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    {% block banner %} {% endblock %}
+
+    {% block content %} {% endblock %}
+
+    {% include 'footer.html' %}
+</body>
+</html>

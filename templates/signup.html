@@ -1,0 +1,152 @@
+{% extends 'homebase.html' %}
+{% block title %}Sign Up - ImpactFund{% endblock %}
+{% block content %}
+
+<!-- Register Area -->
+<section id="register_area" class="section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3 col-md-12 col-sm-12 col-12">
+                <div class="section_heading">
+                    <h3>Register your account</h3>
+                    <h2>Become a
+                        <span class="color_big_heading">member</span>
+                        and enhance your hand
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="author_form_area">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mb-3">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" id="author_form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" name="username" class="form-control" placeholder="Enter username" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" placeholder="Enter email" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="Enter password" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="confirm" class="form-control" placeholder="Confirm password" required />
+                        </div>
+                        
+                        <!-- Role Selection -->
+                        <div class="form-group">
+                            <select name="role" class="form-control">
+                                <option value="volunteer">Volunteer</option>
+                                <option value="investor">Investor</option>
+                            </select>
+                            <small class="form-text text-muted">
+                                The Owners role is only granted by the administrator
+                            </small>
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div class="form-group">
+                            <textarea name="bio" rows="2" class="form-control" placeholder="Bio (optional)"></textarea>
+                        </div>
+                        
+                        <!-- Skills -->
+                        <div class="form-group">
+                            <textarea name="skills" rows="2" class="form-control" placeholder="Skills (optional)"></textarea>
+                        </div>
+                        
+                        <!-- Language Selection -->
+                        <div class="form-group">
+                            <select name="language" class="form-control">
+                                <option value="en">English</option>
+                                <option value="uz">Uzbek</option>
+                                <option value="ru">Russian</option>
+                            </select>
+                        </div>
+                        
+                        <div class="author_submit_form">
+                            <button type="submit" class="btn btn_theme btn_md">Register</button>
+                            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Subscribe Area -->
+<section id="subscribe_area">
+    <div class="container">
+        <div class="subscribe_wrapper">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="subscribe_text">
+                        <p>Newsletter</p>
+                        <h3>To get weekly & monthly news,
+                            <span class="color_big_heading">Subscribe</span> to our newsletter.
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="cta_right_side">
+                        <form action="#!" id="subscribe_form">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Your mail address" required="">
+                                <button class="btn btn_theme btn_md" type="submit">Subscribe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Newsletter subscription
+document.getElementById("subscribe_form")?.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const email = this.querySelector('input[type="email"]').value;
+  
+  const res = await fetch("/api/newsletter/subscribe/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken"),
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (res.ok) {
+    alert("Successfully subscribed to newsletter!");
+    this.reset();
+  } else {
+    alert("Error subscribing to newsletter");
+  }
+});
+
+// CSRF token helper
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    for (let cookie of document.cookie.split(";")) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+{% endblock %}

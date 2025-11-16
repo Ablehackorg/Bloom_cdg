@@ -1,0 +1,260 @@
+{% extends 'homebase.html' %}
+{% load static %}
+{% block title %}Blog - Bloom{% endblock %}
+
+{% block content %}
+
+<style>
+  /* Аккуратная обрезка текста в карточках */
+  .line-clamp-3{
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden
+  }
+  /* Картинки */
+  .featured-img{height:420px;object-fit:cover}
+  .card-img-fixed{height:220px;object-fit:cover}
+  /* Бейдж “Featured” на карточке */
+  .badge-floating{
+    position:absolute;top:12px;left:12px;
+    background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(8px);
+    border-radius:20px;padding:.35rem .6rem;font-weight:600
+  }
+  /* Аватар по первой букве если нет фото */
+  .avatar-fallback{
+    width:40px;height:40px;border-radius:50%;
+    background:#e9ecef;color:#495057;display:flex;align-items:center;justify-content:center;
+    font-weight:700
+  }
+  /* Мягкая тень секций */
+  .soft-section{background:#fff;border-radius:1rem;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+</style>
+
+
+<!-- HERO -->
+<section class="py-5 bg-white">
+  <div class="container text-center">
+    <h1 class="display-5 fw-bold mb-2">Bloom Blog</h1>
+    <p class="text-muted mb-0">Insights, stories, and updates from our community</p>
+    {% if user.is_staff or user.is_superuser %}
+    <div class="mt-4">
+      <button class="btn btn-dark rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPostModal">
+        <i class="fa-solid fa-plus me-2"></i>Create Blog Post
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="py-4 bg-light">
+  <div class="container">
+
+    {# ========== FEATURED пост ========== #}
+    {% if posts %}
+    {% with featured_post=posts.first %}
+    <article class="soft-section p-3 mb-4 position-relative overflow-hidden">
+      {% if featured_post.image %}
+        <img src="{{ featured_post.image.url }}" class="w-100 featured-img rounded-3" alt="{{ featured_post.title }}">
+      {% else %}
+        <div class="w-100 featured-img rounded-3 d-flex align-items-center justify-content-center"
+             style="background:linear-gradient(135deg,#4e54c8,#8f94fb)">
+          <i class="fa-solid fa-feather-pointed text-white-50 fs-1"></i>
+        </div>
+      {% endif %}
+
+      <span class="badge-floating">
+        <i class="fa-solid fa-star me-1 text-warning"></i> Featured
+      </span>
+
+      <div class="p-3 p-md-4">
+        <div class="d-flex align-items-center text-muted small mb-2">
+          <span>{{ featured_post.created_at|date:"M d, Y" }}</span>
+        </div>
+
+        <h2 class="h3 fw-bold mb-2">
+          <a href="{% url 'blog-detail' featured_post.id %}" class="link-dark text-decoration-none">
+            {{ featured_post.title }}
+          </a>
+        </h2>
+
+        <p class="text-secondary line-clamp-3 mb-3">{{ featured_post.content|truncatewords:45 }}</p>
+
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            {% if featured_post.author.profile.image %}
+              <img src="{{ featured_post.author.profile.image.url }}" class="rounded-circle me-2" width="40" height="40" alt="{{ featured_post.author.username }}">
+            {% else %}
+              <div class="avatar-fallback me-2">{{ featured_post.author.username|first|upper }}</div>
+            {% endif %}
+            <span class="small text-muted">{{ featured_post.author.username }}</span>
+          </div>
+
+          <a class="btn btn-primary btn-sm rounded-pill" href="{% url 'blog-detail' featured_post.id %}">
+            Read full post <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% endwith %}
+    {% endif %}
+
+    {# ========== GRID карточек постов ========== #}
+    <div class="row g-4">
+      {% for post in posts %}
+      {% if not forloop.first %}
+      <div class="col-md-6 col-lg-4">
+        <article class="card h-100 shadow-sm border-0">
+          {% if post.image %}
+            <img src="{{ post.image.url }}" class="card-img-top card-img-fixed" alt="{{ post.title }}">
+          {% else %}
+            <div class="card-img-top card-img-fixed d-flex align-items-center justify-content-center bg-body-secondary">
+              <i class="fa-solid fa-image text-secondary fs-3"></i>
+            </div>
+          {% endif %}
+
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              {% if post.category %}
+                <span class="badge rounded-pill text-bg-light border">{{ post.category }}</span>
+              {% endif %}
+              <span class="text-muted small">{{ post.created_at|date:"M d, Y" }}</span>
+            </div>
+
+            <h3 class="h6 fw-bold mb-2">
+              <a href="{% url 'blog-detail' post.id %}" class="stretched-link text-decoration-none link-dark">
+                {{ post.title }}
+              </a>
+            </h3>
+
+            <p class="text-secondary line-clamp-3 mb-3">{{ post.content|truncatewords:28 }}</p>
+
+            <div class="mt-auto d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                {% if post.author.profile.image %}
+                  <img src="{{ post.author.profile.image.url }}" class="rounded-circle me-2" width="34" height="34" alt="{{ post.author.username }}">
+                {% else %}
+                  <div class="avatar-fallback me-2" style="width:34px;height:34px;font-size:.85rem">
+                    {{ post.author.username|first|upper }}
+                  </div>
+                {% endif %}
+                <span class="small text-muted">{{ post.author.username }}</span>
+              </div>
+              <div class="text-muted small">
+                <i class="fa-regular fa-comment me-1"></i>{{ post.comments.count }}
+                <span class="ms-3"><i class="fa-regular fa-heart me-1"></i>{{ post.likes.count }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+      {% endif %}
+      {% empty %}
+      <div class="col-12">
+        <div class="soft-section p-5 text-center">
+          <i class="fa-solid fa-feather text-secondary fs-1 mb-2 d-block"></i>
+          <h4 class="mb-1">No blog posts yet</h4>
+          <p class="text-muted mb-0">Check back later for new articles.</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {# ========== PAGINATION ========== #}
+    {% if posts.has_other_pages %}
+    <nav class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if posts.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for i in posts.paginator.page_range %}
+          <li class="page-item {% if posts.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+          </li>
+        {% endfor %}
+
+        {% if posts.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+  </div>
+</section>
+
+{# ========== MODAL (Bootstrap) ========== #}
+{% if user.is_staff or user.is_superuser %}
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Post</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="post" action="{% url 'blog-create' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Post Title</label>
+            <input type="text" name="title" class="form-control" placeholder="Enter post title" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea name="content" rows="5" class="form-control" placeholder="Write your post content" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Post Image</label>
+            <input type="file" name="image" accept="image/*" class="form-control">
+            <div class="form-text">PNG, JPG, GIF up to 10MB</div>
+          </div>
+
+          <div>
+            <label class="form-label">Post Video (Optional)</label>
+            <input type="file" name="video" accept="video/*" class="form-control">
+            <div class="form-text">MP4, MOV up to 50MB</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Post</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  // Modal functions
+  function openModal(id) {
+    document.getElementById(id).classList.remove("hidden");
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeModal(id) {
+    document.getElementById(id).classList.add("hidden");
+    document.body.style.overflow = 'auto';
+  }
+  
+  // Close modal when clicking outside
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+      closeModal(e.target.id);
+    }
+  });
+</script>
+
+{% endblock %}

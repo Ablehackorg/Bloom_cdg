@@ -1,0 +1,29 @@
+{% load static %}
+<!-- Banner Area -->
+<section id="home_one_banner">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="banner_one_text">
+                    <h1><span><span class="color_big">Share</span> your love to</span> make someone's life better</h1>
+            <p class="lead">Every act of generosity, no matter how small, creates ripples of positive change. Join our community of compassionate individuals making a real difference in people's lives.</p>
+                    <div class="banner_buttons mt-4">
+                        <a href="{% url 'project-list' %}" class="btn btn_theme btn_md me-3">Explore Projects</a>
+                        <a href="" class="btn btn_theme btn_md">Support Us</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="banner_one_img">
+                    <img src="{% static 'img/banner/ban
+                    ner.png' %}" alt="Bloom - Share your love">
+                    <div class="banner_element">
+                        <img src="{% static 'img/banner/element-1.png' %}" alt="icon" class="element_1 shape-1">
+                        <img src="{% static 'img/banner/element-2.png' %}" alt="icon" class="element_2 shape-2">
+                        <img src="{% static 'img/banner/element-3.png' %}" alt="icon" class="element_3 shape-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

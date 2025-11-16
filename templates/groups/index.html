@@ -1,0 +1,376 @@
+{% extends 'homebase.html' %}
+{% load static %}
+{% block title %}Groups - Bloom{% endblock %}
+{% block content %}
+
+<style>
+  :root{
+    --primary:#4F46E5;--primary2:#4338CA;--success:#10B981;--warn:#F59E0B;--danger:#EF4444;
+    --ink:#0f172a;--muted:#6b7280;--line:#e5e7eb;--card:#fff;--bg:#f7f8fb;
+    --radius:12px;--shadow:0 14px 40px rgba(2,6,23,.08), 0 6px 18px rgba(2,6,23,.06)
+  }
+  /* прячем декоративные «волны» базовой темы только на этой странице */
+  .hero-shape,.header-shape,.shape,[class*="shape-"]{display:none!important}
+
+  #groupsPage{background:var(--bg);padding:24px 0}
+  #groupsPage .container{max-width:1180px;margin:0 auto;padding:0 16px}
+
+  /* titlebar */
+  .gp-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .gp-h1{font-weight:800;font-size:22px;color:var(--ink)}
+  .gp-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid transparent;font-weight:800;cursor:pointer}
+  .gp-btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 22px rgba(79,70,229,.2)}
+  .gp-btn-primary:hover{background:var(--primary2)}
+  .gp-btn-ghost{background:#fff;border-color:var(--line)}
+  .gp-btn-warn{background:var(--warn);color:#fff}
+  .gp-btn-danger{background:var(--danger);color:#fff}
+
+  /* layout */
+  .gp-grid{display:grid;grid-template-columns:320px 1fr;gap:18px}
+  @media (max-width:980px){.gp-grid{grid-template-columns:1fr}}
+
+  /* sidebar */
+  .gp-card{background:var(--card);border-radius:16px;box-shadow:var(--shadow)}
+  .gp-search{position:relative;padding:12px;border-bottom:1px solid var(--line)}
+  .gp-search .inp{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 38px;font-weight:600}
+  .gp-search svg{position:absolute;left:20px;top:18px;color:#94a3b8}
+  .gp-list{max-height:60vh;overflow:auto}
+  .gp-li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--line);cursor:pointer}
+  .gp-li:first-child{border-top:0}
+  .gp-li:hover{background:#f8fafc}
+  .gp-li.active{background:#eef2ff;border-left:3px solid var(--primary)}
+  .gp-name{font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gp-chip{font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid}
+  .gp-open{background:#e8f7f1;color:#065f46;border-color:#b7f0db}
+  .gp-closed{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+  .gp-badge{min-width:22px;height:22px;border-radius:11px;background:#ede9fe;color:#4c1d95;display:grid;place-items:center;font-size:11px;font-weight:800}
+  .gp-badge.hidden{display:none}
+
+  /* chat card */
+  .gp-chat{background:#fff;border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;height:75vh;overflow:hidden}
+  .gp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .gp-title{font-size:18px;font-weight:800;color:var(--ink)}
+  .gp-desc{font-size:13px;color:#748094;margin-top:2px}
+
+  /* scroller + empty */
+  .gp-scroll{flex:1;background:#f8fafc;padding:16px;overflow:auto}
+  .gp-empty{min-height:260px;display:grid;place-items:center;color:#8a93a5;text-align:center}
+  .gp-empty .ico{width:54px;height:54px;background:#e8ecf5;border-radius:16px;display:grid;place-items:center;margin:0 auto 8px}
+
+  /* day separator */
+  .gp-day{position:sticky;top:6px;display:flex;gap:8px;align-items:center;margin:12px 0;z-index:1}
+  .gp-day::before,.gp-day::after{content:"";flex:1;height:1px;background:#e3e6ee}
+  .gp-day span{background:#fff;border:1px solid #e3e6ee;border-radius:999px;padding:2px 10px;font-size:11px;color:#64748b;font-weight:800}
+
+  /* messages */
+  .gp-msg{display:flex;align-items:flex-end;gap:10px;margin:10px 0}
+  .gp-msg.me{justify-content:flex-end}
+  .gp-av{width:36px;height:36px;border-radius:50%;background:#eef2ff;color:#4338ca;display:grid;place-items:center;font-weight:900}
+  .gp-bub{max-width:68%;background:#fff;border:1px solid #eaeef7;border-radius:16px 16px 16px 6px;padding:10px 12px;box-shadow:0 8px 18px rgba(2,6,23,.04)}
+  .gp-meta{display:flex;gap:8px;align-items:center;margin-bottom:4px}
+  .gp-from{font-size:13px;font-weight:800;color:#0f172a}
+  .gp-time{font-size:11px;color:#94a3b8;font-weight:800}
+  .gp-msg.me .gp-bub{background:var(--primary);border-color:transparent;color:#fff;border-radius:16px 16px 6px 16px}
+  .gp-msg.me .gp-from{color:#c7d2fe}
+  .gp-msg.me .gp-time{color:#e0e7ff}
+  .gp-msg.me .gp-av{order:2;background:#dbeafe;color:#1e3a8a}
+
+  /* composer */
+  .gp-compose{border-top:1px solid var(--line);padding:12px;background:#fff}
+  .gp-row{display:flex;align-items:flex-end;gap:10px}
+  .gp-tools{display:flex;gap:8px}
+  .gp-ibtn{width:38px;height:38px;border:1px dashed var(--line);border-radius:10px;background:#fff;color:#94a3b8;display:grid;place-items:center;cursor:pointer}
+  .gp-ibtn:hover{border-color:var(--primary);color:var(--primary)}
+  .gp-ta{flex:1;border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-height:46px;max-height:160px;resize:vertical;font-weight:600}
+  .gp-ta:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgb(79 70 229 / .12)}
+  .gp-send{min-width:92px}
+
+  .gp-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .gp-chipAttach{display:inline-flex;align-items:center;gap:8px;background:#eef2ff;color:#4338ca;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+  .gp-chipAttach button{border:0;background:transparent;color:#4338ca;cursor:pointer}
+
+  /* drag overlay */
+  .gp-drop{display:none;position:absolute;inset:0;background:rgba(79,70,229,.07);backdrop-filter:blur(2px);align-items:center;justify-content:center;z-index:5}
+  .gp-drop.active{display:flex}
+  .gp-hint{background:#fff;border:2px dashed #a5b4fc;border-radius:16px;padding:16px 22px;color:#4f46e5;font-weight:800}
+
+  /* admin bar */
+  .gp-admin{display:flex;gap:8px;justify-content:flex-end;padding:10px;border-top:1px solid var(--line);background:#fafafb}
+
+  /* modal */
+  .gp-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:60}
+  .gp-modal.open{display:flex;animation:fade .18s ease-out}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .gp-panel{width:min(560px,92vw);background:#fff;border-radius:18px;box-shadow:var(--shadow);transform:translateY(6px) scale(.98);opacity:0;animation:pop .22s .02s ease-out forwards}
+  @keyframes pop{to{transform:none;opacity:1}}
+  .gp-ph{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .gp-pt{font-weight:800}
+  .gp-x{width:40px;height:40px;border:0;background:transparent;border-radius:10px;color:#64748b;cursor:pointer}
+  .gp-x:hover{background:#f1f5f9}
+  .gp-pb{padding:18px 20px;display:grid;gap:12px}
+  .gp-l{font-weight:800;font-size:13px;color:#334155}
+  .gp-inp,.gp-text{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:600}
+  .gp-text{min-height:92px;resize:vertical}
+  .gp-inp:focus,.gp-text:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgb(79 70 229 / .12)}
+  .gp-pf{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+
+  /* === Chat input upgrade === */
+  .gp-compose{ padding:16px 16px 18px; }
+  .gp-row{ gap:12px; align-items:center; }
+  .gp-ta{
+    min-height:68px;
+    padding:14px 16px;
+    font-size:15px;
+    line-height:1.5;
+    border-radius:14px;
+  }
+  @media (min-width:1024px){
+    .gp-ta{ min-height:76px; }
+  }
+  .gp-ibtn{
+    width:44px; height:44px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    color:#94a3b8;
+    background:#fff;
+    transition:.15s;
+  }
+  .gp-ibtn:hover{ color:var(--primary); border-color:var(--primary); box-shadow:0 4px 14px rgb(79 70 229 / .15); }
+  .gp-send{ height:44px; display:inline-flex; align-items:center; justify-content:center; }
+  .gp-chat{ height:calc(100vh - 260px); }
+  @media (max-width:640px){
+    .gp-row{ flex-direction:column; align-items:stretch; }
+    .gp-ibtn, .gp-send{ width:100%; }
+  }
+
+</style>
+
+<div id="groupsPage">
+  <div class="container">
+    <div class="gp-bar">
+      <div class="gp-h1">Groups</div>
+      {% if request.user.is_authenticated and request.user.is_staff %}
+      <button class="gp-btn gp-btn-primary" onclick="openModal('groupModal')">＋ New Group</button>
+      {% endif %}
+    </div>
+
+    <div class="gp-grid">
+      <!-- SIDEBAR -->
+      <aside class="gp-card">
+        <div class="gp-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path stroke="#94a3b8" stroke-width="2" stroke-linecap="round" d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/></svg>
+          <input id="groupSearch" class="inp" placeholder="Search groups…">
+        </div>
+        <div id="groupList" class="gp-list">
+          {% for g in groups %}
+          <div class="gp-li {% if current_group and g.id == current_group.id %}active{% endif %}" data-unread="{{ g.unread_count|default:0 }}" onclick="location.href='?group={{ g.id }}'">
+            <div class="gp-name" title="{{ g.name }}">{{ g.name }}</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              {% if g.is_closed %}<span class="gp-chip gp-closed">CLOSED</span>{% else %}<span class="gp-chip gp-open">OPEN</span>{% endif %}
+              <span class="gp-badge{% if not g.unread_count %} hidden{% endif %}">{{ g.unread_count|default:0 }}</span>
+            </div>
+          </div>
+          {% empty %}
+          <div class="gp-li"><div class="gp-name" style="opacity:.6">No groups yet</div></div>
+          {% endfor %}
+        </div>
+      </aside>
+
+      <!-- CHAT -->
+      <main class="gp-chat" style="position:relative">
+        {% if current_group %}
+        <div class="gp-head">
+          <div>
+            <div class="gp-title">{{ current_group.name }}</div>
+            {% if current_group.description %}<div class="gp-desc">{{ current_group.description }}</div>{% endif %}
+          </div>
+          {% if current_group.is_closed %}<span class="gp-chip gp-closed">CLOSED</span>{% else %}<span class="gp-chip gp-open">OPEN</span>{% endif %}
+        </div>
+
+        <div id="dropOverlay" class="gp-drop"><div class="gp-hint">Drop files to attach</div></div>
+        <div id="chatBox" class="gp-scroll">
+          <div class="gp-empty"><div><div class="ico">💬</div>Loading messages…</div></div>
+        </div>
+
+        <div class="gp-compose">
+          {% if request.user.is_authenticated %}
+            {% if not current_group.is_closed %}
+            <div class="gp-row">
+              <div class="gp-tools">
+                <label class="gp-ibtn" title="Attach files">
+                  <input id="filePicker" type="file" multiple hidden>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 17a5 5 0 005 5 5 5 0 005-5V7a3 3 0 00-6 0v9a1 1 0 102 0V7a1 1 0 112 0v10a3 3 0 01-6 0V7a5 5 0 0110 0v10a7 7 0 11-14 0V7a3 3 0 116 0v9a1 1 0 11-2 0V7"/></svg>
+                </label>
+              </div>
+              <div style="flex:1">
+                <textarea id="chatInput" class="gp-ta" placeholder="Type your message…" maxlength="4000"></textarea>
+                <div id="chips" class="gp-chips"></div>
+              </div>
+              <button class="gp-btn gp-btn-primary gp-send" onclick="sendMessage()">Send</button>
+            </div>
+            {% else %}
+              <div style="text-align:center;color:#a1a8b6;font-weight:800">Messaging is disabled for closed groups.</div>
+            {% endif %}
+          {% else %}
+            <div style="text-align:center;color:#748094">You must <a href="{% url 'login' %}" style="color:var(--primary);font-weight:800">login</a> to send messages.</div>
+          {% endif %}
+        </div>
+
+        {% if is_owner_or_admin %}
+        <div class="gp-admin">
+          {% if not current_group.is_closed %}
+          <button class="gp-btn gp-btn-warn" onclick="groupAction('close')">Close Group</button>
+          {% else %}
+          <button class="gp-btn" style="background:var(--success);color:#fff" onclick="groupAction('reopen')">Reopen Group</button>
+          {% endif %}
+          <button class="gp-btn gp-btn-danger" onclick="groupAction('remove')">Delete Group</button>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="gp-scroll">
+          <div class="gp-empty"><div><div class="ico">💬</div>Please select a group from the left</div></div>
+        </div>
+        {% endif %}
+      </main>
+    </div>
+  </div>
+</div>
+
+{% if request.user.is_authenticated and request.user.is_staff %}
+<!-- MODAL -->
+<div id="groupModal" class="gp-modal" role="dialog" aria-modal="true">
+  <div class="gp-panel" onclick="event.stopPropagation()">
+    <div class="gp-ph">
+      <div class="gp-pt">Create New Group</div>
+      <button class="gp-x" onclick="closeModal('groupModal')" aria-label="Close">✕</button>
+    </div>
+    <form id="createGroupForm" class="gp-pb">
+      <label class="gp-l">Group name<input name="name" class="gp-inp" placeholder="e.g., Clean Water Systems" required></label>
+      <label class="gp-l">Description <span style="color:#94a3b8;font-size:12px;font-weight:800">(optional)</span>
+        <textarea name="description" class="gp-text" placeholder="Short description…"></textarea>
+      </label>
+      <label class="gp-l">Related SDG <span style="color:#94a3b8;font-size:12px;font-weight:800">(optional)</span>
+        <input name="sdg" class="gp-inp" placeholder="Clean Water &amp; Sanitation">
+      </label>
+      <label class="gp-l" style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="is_closed" style="width:18px;height:18px;accent-color:var(--primary)"> Start as closed</label>
+      <div class="gp-pf">
+        <button type="button" class="gp-btn gp-btn-ghost" onclick="closeModal('groupModal')">Cancel</button>
+        <button id="createGroupBtn" type="submit" class="gp-btn gp-btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<script>
+/* --- helpers / modal / csrf --- */
+function getCookie(n){let v=null;if(document.cookie){document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1));});}return v;}
+function openModal(id){const m=document.getElementById(id);if(!m)return;m.classList.add('open');document.body.style.overflow='hidden';m.onclick=e=>{if(e.target===m)closeModal(id)};setTimeout(()=>m.querySelector('input,textarea')?.focus(),10);}
+function closeModal(id){const m=document.getElementById(id);if(!m)return;m.classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('groupModal')?.classList.contains('open'))closeModal('groupModal')});
+
+/* --- search sidebar --- */
+(function(){const s=document.getElementById('groupSearch');const list=document.getElementById('groupList');
+s?.addEventListener('input',()=>{const q=s.value.toLowerCase();list?.querySelectorAll('.gp-li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'flex':'none';});});
+list?.querySelectorAll('.gp-li').forEach(li=>{const b=li.querySelector('.gp-badge');const n=parseInt(li.dataset.unread||'0',10);if(b&&n>0){b.classList.remove('hidden');b.textContent=n;}});
+})();
+
+/* --- create group --- */
+{% if request.user.is_authenticated and request.user.is_staff %}
+document.getElementById('createGroupForm')?.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const btn=document.getElementById('createGroupBtn');btn.disabled=true;btn.textContent='Creating…';
+  const f=new FormData(e.currentTarget);const data=Object.fromEntries(f.entries());data.is_closed=!!f.get('is_closed');
+  const res=await fetch('/api/groups/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify(data)});
+  btn.disabled=false;btn.textContent='Create';
+  if(res.ok){closeModal('groupModal');location.href='/groups/';}else{const err=await res.json().catch(()=>({detail:'Unknown error'}));alert(err.detail||JSON.stringify(err));}
+});
+{% endif %}
+
+/* --- chat --- */
+{% if current_group %}
+const groupId={{ current_group.id }};
+const me=parseInt("{{ request.user.id|default:'0' }}");
+const box=document.getElementById('chatBox');const ta=document.getElementById('chatInput');
+const drop=document.getElementById('dropOverlay');const filePicker=document.getElementById('filePicker');const chips=document.getElementById('chips');
+let attachments=[];
+
+function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function dKey(d){const x=new Date(d);return `${x.getFullYear()}-${x.getMonth()+1}-${x.getDate()}`;}
+function dLabel(d){const x=new Date(d);const today=new Date();today.setHours(0,0,0,0);const y=new Date(x);y.setHours(0,0,0,0);
+  const diff=(today-y)/86400000;if(diff===0)return' TODAY ';if(diff===1)return' YESTERDAY ';
+  return x.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'});}
+function tLabel(d){return new Date(d).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+function msgHtml(m){
+  const mine=(m.user===me);
+  const name=m.user_username||'User';
+  const init=name.slice(0,1).toUpperCase();
+  return `
+    <div class="gp-msg ${mine?'me':''}">
+      ${mine?'':`<div class="gp-av">${init}</div>`}
+      <div class="gp-bub">
+        <div class="gp-meta"><span class="gp-from">${mine?'You':esc(name)}</span><span class="gp-time">${tLabel(m.created_at)}</span></div>
+        <div>${esc(m.text)}</div>
+      </div>
+      ${mine?`<div class="gp-av">${("{{ request.user.username|default_if_none:'' }}".slice(0,1).toUpperCase())||'Y'}</div>`:''}
+    </div>`;
+}
+function daySep(label){return `<div class="gp-day"><span>${label}</span></div>`;}
+
+async function loadMessages(){
+  try{
+    const r=await fetch(`/api/groups/${groupId}/messages/`);
+    if(!r.ok){box.innerHTML=`<div class="gp-empty"><div>Error loading (${r.status})</div></div>`;return;}
+    const data=await r.json();
+    if(!data.length){box.innerHTML=`<div class="gp-empty"><div><div class="ico">📝</div>No messages yet. Be the first!</div></div>`;return;}
+    data.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    let html='',last='';
+    for(const m of data){
+      const k=dKey(m.created_at);
+      if(k!==last){html+=daySep(dLabel(m.created_at));last=k;}
+      html+=msgHtml(m);
+    }
+    box.innerHTML=html; box.scrollTop=box.scrollHeight;
+    // сброс бейджа у активной группы
+    document.querySelector('.gp-li.active .gp-badge')?.classList.add('hidden');
+  }catch(e){box.innerHTML=`<div class="gp-empty"><div>Error: ${e.message}</div></div>`;}
+}
+
+async function sendMessage(){
+  const text=ta.value.trim(); if(!text && !attachments.length) return;
+  try{
+    if(attachments.length){
+      const fd=new FormData(); fd.append('text', text); attachments.forEach(f=>fd.append('files[]',f,f.name));
+      const r=await fetch(`/api/groups/${groupId}/send/`,{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')},body:fd});
+      if(!r.ok){await fetch(`/api/groups/${groupId}/send/`,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({text})});}
+    }else{
+      await fetch(`/api/groups/${groupId}/send/`,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({text})});
+    }
+    ta.value=''; attachments=[]; chips.innerHTML=''; loadMessages();
+  }catch(e){alert('Send error: '+e.message);}
+}
+window.sendMessage=sendMessage;
+
+ta?.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+
+function addFiles(fs){ for(const f of fs){ attachments.push(f); const chip=document.createElement('span'); chip.className='gp-chipAttach'; chip.innerHTML=`${f.name} <button>&times;</button>`; chip.querySelector('button').onclick=()=>{attachments=attachments.filter(x=>x!==f);chip.remove();}; chips.appendChild(chip);} }
+filePicker?.addEventListener('change',e=> addFiles([...e.target.files]));
+
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();drop?.classList.add('active');}));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();drop?.classList.remove('active');}));
+document.addEventListener('drop',e=>{if(e.dataTransfer?.files?.length)addFiles([...e.dataTransfer.files]);});
+
+async function groupAction(action){
+  if(action==='remove' && !confirm('Delete this group?')) return;
+  const method= action==='remove' ? 'DELETE' : 'POST';
+  const r=await fetch(`/api/groups/${groupId}/${action}/`,{method,headers:{'X-CSRFToken':getCookie('csrftoken')}});
+  if(r.ok){ action==='remove' ? location.href='/groups/' : location.reload(); }
+}
+window.groupAction=groupAction;
+
+loadMessages(); setInterval(loadMessages,3000);
+{% endif %}
+</script>
+
+{% endblock %}

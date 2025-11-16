@@ -1,0 +1,373 @@
+{% extends 'homebase.html' %}
+{% load static %}
+{% block title %}About - Bloom{% endblock %}
+
+{% block content %}
+<style>
+  /* Hero banner bg */
+  #common_banner_area{
+    background-image:
+      linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
+      url("{% static 'img/about/about-hero.jpg' %}");
+    background-size: cover; background-position: center;
+  }
+  /* Team grid — ровные карточки */
+  .team-grid {row-gap: 2rem;}
+  .volunteer_wrapper{
+    height:100%; border-radius:16px; overflow:hidden; background:#fff;
+    box-shadow:0 10px 25px rgba(0,0,0,.06); transition:transform .25s, box-shadow .25s;
+  }
+  .volunteer_wrapper:hover{ transform:translateY(-6px); box-shadow:0 16px 40px rgba(0,0,0,.10); }
+  .volunteer_img{ position:relative; aspect-ratio:1/1; overflow:hidden; }
+  .volunteer_img img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .volunteer_icon{ position:absolute; inset:auto 0 0 0; padding:.6rem 1rem;
+    background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0)); opacity:0; transition:.25s; }
+  .volunteer_wrapper:hover .volunteer_icon{ opacity:1; }
+  .volunteer_icon ul{ display:flex; gap:.5rem; justify-content:center; }
+  .volunteer_icon a{ color:#fff; font-size:18px; width:36px; height:36px;
+    display:grid; place-items:center; border:1px solid rgba(255,255,255,.5); border-radius:50%; }
+  .volunteer_text{ padding:1rem 1.25rem 1.4rem; text-align:center; }
+  .volunteer_text p{ color:#6c757d; margin:0; }
+</style>
+
+<!-- Preloader -->
+<div class="preloader">
+  <div class="d-table"><div class="d-table-cell">
+    <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  </div></div>
+</div>
+
+<!-- Banner -->
+<section id="common_banner_area">
+  <div class="container">
+    <div class="row"><div class="col-12">
+      <div class="commn_banner_page">
+        <h2><span class="color_big_heading">About</span> Bloom</h2>
+        <ul class="breadcrumb_wrapper">
+          <li class="breadcrumb_item"><a href="{% url 'home' %}">Home</a></li>
+          <li class="breadcrumb_item"><img src="{% static 'img/icon/arrow.png' %}" alt="arrow"></li>
+          <li class="breadcrumb_item active">About Us</li>
+        </ul>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about_area" class="section_padding">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="about_area_img">
+          <img src="{% static 'media/about.jpg' %}" alt="About Bloom">
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="about_area_main_text">
+          <div class="about_area_heading_two">
+            <h2>A world where <span class="color_big_heading">poverty</span><br/>will not exist</h2>
+            <h3>We are the largest crowdfunding</h3>
+          </div>
+          <div class="about_area_para">
+            <h5>Bloom is a platform dedicated to supporting independent filmmakers and creators who tell stories that matter.</h5>
+            <p>We believe in cinema’s power to inspire change and bring communities together. Our mission is to provide resources, funding, and mentorship for visionary creators aligned with the UN Sustainable Development Goals.</p>
+            <p>Through our network of investors, volunteers, and industry professionals, we’ve helped launch 50+ impact projects across 30+ countries.</p>
+          </div>
+          <div class="about_vedio_area">
+            <a href="{% url 'project-list' %}" class="btn btn_theme btn_md">View Projects</a>
+            <a href="https://vimeo.com/45830194" class="vedio_btn popup-vimeo"><i class="fa fa-play"></i>Our Story</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section id="counter_area" class="section_padding bg-color">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-6"><div class="counter_box">
+        <img src="{% static 'img/icon/fun-1.png' %}" alt="icon">
+        <div class="counter_text"><h2 class="counter-number">127</h2><p>Projects Funded</p></div>
+      </div></div>
+      <div class="col-lg-3 col-md-6"><div class="counter_box">
+        <img src="{% static 'img/icon/fun-2.png' %}" alt="icon">
+        <div class="counter_text"><h2 class="counter-number">42</h2><p>Countries Reached</p></div>
+      </div></div>
+      <div class="col-lg-3 col-md-6"><div class="counter_box">
+        <img src="{% static 'img/icon/fun-3.png' %}" alt="icon">
+        <div class="counter_text"><h2><span class="counter-number">3.2</span>M</h2><p>Dollars Invested</p></div>
+      </div></div>
+      <div class="col-lg-3 col-md-6"><div class="counter_box">
+        <img src="{% static 'img/icon/fun-4.png' %}" alt="icon">
+        <div class="counter_text"><h2 class="counter-number">5280</h2><p>Lives Impacted</p></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Values -->
+<section id="values_area" class="section_padding">
+  <div class="container">
+    <div class="row"><div class="col-lg-6 offset-lg-3">
+      <div class="section_heading">
+        <h3>Our Principles</h3>
+        <h2>Core values that <span class="color_big_heading">guide</span> our work</h2>
+      </div>
+    </div></div>
+    <div class="row">
+      <div class="col-lg-4 col-md-6"><div class="values_box">
+        <div class="values_icon"><img src="{% static 'img/icon/value-1.png' %}" alt="icon"></div>
+        <div class="values_text"><h3>Transparency</h3><p>Open reporting on how funds are allocated and how projects progress.</p></div>
+      </div></div>
+      <div class="col-lg-4 col-md-6"><div class="values_box">
+        <div class="values_icon"><img src="{% static 'img/icon/value-2.png' %}" alt="icon"></div>
+        <div class="values_text"><h3>Collaboration</h3><p>Great films are made through partnership and a shared creative vision.</p></div>
+      </div></div>
+      <div class="col-lg-4 col-md-6"><div class="values_box">
+        <div class="values_icon"><img src="{% static 'img/icon/value-3.png' %}" alt="icon"></div>
+        <div class="values_text"><h3>Impact</h3><p>We measure success by the positive change our films create worldwide.</p></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Team (static, без циклов) -->
+<section id="volunteer_area" class="section_after section_padding bg-color">
+  <div class="container">
+    <div class="row"><div class="col-lg-6 offset-lg-3">
+      <div class="section_heading">
+        <h3>Creative Minds</h3>
+        <h2>Meet the <span class="color_big_heading">team</span> behind Bloom</h2>
+      </div>
+    </div></div>
+
+    <div class="row team-grid">
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/1.jpg' %}" alt="Shoxa">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Shoxa</a></h3>
+            <p>Founder & CEO</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/2.jpg' %}" alt="Azamat">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Azamat</a></h3>
+            <p>Head of Partnerships</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/3.jpg' %}" alt="Humoyun">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Humoyun</a></h3>
+            <p>Community Manager</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/4.jpg' %}" alt="Muhammadyusuf">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Muhammadyusuf</a></h3>
+            <p>Creative Director</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/5.jpg' %}" alt="Timur">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Timur</a></h3>
+            <p>Project Coordinator</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="volunteer_wrapper">
+          <div class="volunteer_img">
+            <img src="{% static 'img/team/6.jpg' %}" alt="Adela">
+            <div class="volunteer_icon">
+              <ul>
+                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="volunteer_text">
+            <h3><a href="#!">Adela</a></h3>
+            <p>Marketing Lead</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="newletter_banner">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <div class="newletter_text">
+          <h4><img src="{% static 'img/icon/about.png' %}" alt="icon"> Join Our Community</h4>
+          <h2>Ready to bring your <span class="color_big_heading">vision</span> to life?</h2>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="newletter_button">
+          <a href="{% url 'project-list' %}" class="btn news_btn btn_theme">Start a Project</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonial_area" class="section_padding">
+  <div class="container">
+    <div class="row"><div class="col-lg-6 offset-lg-3">
+      <div class="section_heading">
+        <h3>Success Stories</h3>
+        <h2>What filmmakers say about <span class="color_big_heading">Bloom</span></h2>
+      </div>
+    </div></div>
+    <div class="row">
+      <div class="col-12">
+        <div class="testimonial_slider_wrapper owl-theme owl-carousel slider_dots">
+          <div class="testimonial_wrapper_boxed">
+            <img src="{% static 'img/testimonial/test-1.png' %}" alt="author">
+            <p>Bloom provided not just funding, but invaluable mentorship that helped bring my documentary to international audiences.</p>
+            <div class="test_author">
+              <img src="{% static 'img/common/quot.png' %}" alt="quote">
+              <h4>Maria Rodriguez</h4><h5>Documentary Filmmaker</h5>
+            </div>
+          </div>
+          <div class="testimonial_wrapper_boxed">
+            <img src="{% static 'img/testimonial/test-2.png' %}" alt="author">
+            <p>As a first-time director, I was amazed by the network Bloom connected me with. We assembled an incredible team.</p>
+            <div class="test_author">
+              <img src="{% static 'img/common/quot.png' %}" alt="quote">
+              <h4>James Chen</h4><h5>Short Film Director</h5>
+            </div>
+          </div>
+          <div class="testimonial_wrapper_boxed">
+            <img src="{% static 'img/testimonial/test-3.png' %}" alt="author">
+            <p>The transparency throughout the funding process was refreshing. Bloom truly cares about the success of your project.</p>
+            <div class="test_author">
+              <img src="{% static 'img/common/quot.png' %}" alt="quote">
+              <h4>Sophie Williams</h4><h5>Producer</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Partners -->
+<section id="partner_area-2" class="section_padding_bottom">
+  <div class="container">
+    <div class="row"><div class="col-12">
+      <div class="partner_slider_wrapper owl-theme owl-carousel">
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/1.png' %}" alt="partner 1"></a></div>
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/2.png' %}" alt="partner 2"></a></div>
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/3.png' %}" alt="partner 3"></a></div>
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/4.png' %}" alt="partner 4"></a></div>
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/5.png' %}" alt="partner 5"></a></div>
+        <div class="partner_logo"><a href="#!"><img src="{% static 'img/partners/6.png' %}" alt="partner 6"></a></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<!-- Subscribe -->
+<section id="subscribe_area">
+  <div class="container">
+    <div class="subscribe_wrapper">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="subscribe_text">
+            <p>Stay Updated</p>
+            <h3>Get the latest news on <span class="color_big_heading">upcoming</span> projects and opportunities</h3>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="cta_right_side">
+            <form action="#!" id="subscribe_form">
+              <div class="input-group">
+                <input type="email" class="form-control" placeholder="Your email address" required>
+                <button class="btn btn_theme btn_md" type="submit">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

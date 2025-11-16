@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header and create button (admin only) -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Discover Projects</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Find interesting initiatives and join them</p>
+            </div>
+            {% if user.is_staff or user.is_superuser %}
+            <button onclick="openModal('projectModal')" class="mt-4 sm:mt-0 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 transform hover:-translate-y-1 flex items-center">
+                <i class="fas fa-plus-circle mr-2"></i> Create Project
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- Category filters -->
+        <div class="mb-12">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Project Categories</h2>
+            <div class="flex flex-wrap gap-3">
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-blue-600 text-white shadow-md transition-all duration-300 hover:shadow-lg" data-category="all">
+                    All Projects
+                </button>
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-400" data-category="health">
+                    <i class="fas fa-heartbeat mr-2"></i>Health
+                </button>
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400" data-category="education">
+                    <i class="fas fa-graduation-cap mr-2"></i>Education
+                </button>
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm transition-all duration-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400" data-category="environment">
+                    <i class="fas fa-leaf mr-2"></i>Environment
+                </button>
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm transition-all duration-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-400" data-category="innovation">
+                    <i class="fas fa-lightbulb mr-2"></i>Innovation
+                </button>
+                <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm transition-all duration-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-700 dark:hover:text-pink-400" data-category="equality">
+                    <i class="fas fa-balance-scale mr-2"></i>Equality
+                </button>
+            </div>
+        </div>
+
+        <!-- Projects grid -->
+        <div id="projects" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for project in projects %}
+            <div class="project-card bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
+                 data-category="{{ project.category }}">
+                <!-- Project image -->
+                <div class="h-48 w-full overflow-hidden">
+                    {% if project.image %}
+                    <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                    {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center">
+                        <i class="fas fa-image text-4xl text-blue-400 dark:text-blue-500"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Project content -->
+                <div class="p-6">
+                    <!-- Title and category -->
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">{{ project.title }}</h3>
+                        <span class="text-xs px-3 py-1 rounded-full
+                            {% if project.category == 'health' %} bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400
+                            {% elif project.category == 'education' %} bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400
+                            {% elif project.category == 'environment' %} bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400
+                            {% elif project.category == 'innovation' %} bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400
+                            {% elif project.category == 'equality' %} bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400
+                            {% else %} bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 {% endif %}">
+                            {{ project.get_category_display }}
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">{{ project.description }}</p>
+
+                    <!-- Progress -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm font-medium mb-2">
+                            <span class="text-blue-600 dark:text-blue-400">${{ project.collected_amount }}</span>
+                            <span class="text-gray-500 dark:text-gray-400">Goal: ${{ project.goal_amount }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                            <div class="h-2.5 rounded-full
+                                {% if project.progress >= 100 %}bg-green-500
+                                {% elif project.progress >= 50 %}bg-blue-500
+                                {% else %}bg-yellow-500{% endif %}"
+                                style="width: {{ project.progress }}%">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Progress: {{ project.progress|floatformat:0 }}%</p>
+                    </div>
+
+                    <!-- Action button -->
+                    <a href="{% url 'project-detail' project.id %}" class="block w-full py-3 text-center rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg flex items-center justify-center">
+                        <i class="fas fa-eye mr-2"></i> View Details
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-folder-open text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">No projects yet</h3>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Check back later for new projects</p>
+                {% if user.is_staff or user.is_superuser %}
+                <button onclick="openModal('projectModal')" class="mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                    Create Project
+                </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination (if needed) -->
+        {% if projects.has_other_pages %}
+        <div class="mt-12 flex justify-center">
+            <div class="flex space-x-2">
+                {% if projects.has_previous %}
+                <a href="?page={{ projects.previous_page_number }}" class="px-4 py-2 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+
+                {% for i in projects.paginator.page_range %}
+                {% if projects.number == i %}
+                <span class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg">{{ i }}</span>
+                {% else %}
+                <a href="?page={{ i }}" class="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">{{ i }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if projects.has_next %}
+                <a href="?page={{ projects.next_page_number }}" class="px-4 py-2 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-medium rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Create project modal (admin only) -->
+{% if user.is_staff or user.is_superuser %}
+<div id="projectModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-xl transform transition-all modal-animation">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Create New Project</h2>
+            <button onclick="closeModal('projectModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form id="createProjectForm" class="space-y-4" enctype="multipart/form-data">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Title</label>
+                <input type="text" name="title" placeholder="Enter project title" required class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <textarea name="description" placeholder="Describe your project" required rows="3" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Goal Amount ($)</label>
+                <input type="number" name="goal_amount" placeholder="Enter amount" required class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Image</label>
+                <div class="flex items-center justify-center w-full">
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition bg-white dark:bg-gray-700">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop or select a file</p>
+                        </div>
+                        <input type="file" name="image" accept="image/*" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Region</label>
+                    <select name="region" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="andijan">Andijan</option>
+                        <option value="bukhara">Bukhara</option>
+                        <option value="fergana">Fergana</option>
+                        <option value="jizzakh">Jizzakh</option>
+                        <option value="namangan">Namangan</option>
+                        <option value="navoiy">Navoiy</option>
+                        <option value="kashkadarya">Kashkadarya</option>
+                        <option value="samarkand">Samarkand</option>
+                        <option value="sirdarya">Sirdarya</option>
+                        <option value="surkhandarya">Surkhandarya</option>
+                        <option value="tashkent">Tashkent</option>
+                        <option value="karakalpakstan">Karakalpakstan</option>
+                        <option value="khorezm">Khorezm</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                    <select name="category" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                        <option value="environment">Environment</option>
+                        <option value="innovation">Innovation</option>
+                        <option value="equality">Equality</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal('projectModal')" class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
+                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-medium rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-800 transition-all duration-300">
+                    Create Project
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Modal functions
+function openModal(id) {
+    document.getElementById(id).classList.remove("hidden");
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.add("hidden");
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+const projectModal = document.getElementById('projectModal');
+if (projectModal) {
+    projectModal.addEventListener('click', function(e) {
+        if (e.target.id === 'projectModal') {
+            closeModal('projectModal');
+        }
+    });
+}
+
+// Category filtering
+document.addEventListener("DOMContentLoaded", () => {
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    const projectCards = document.querySelectorAll(".project-card");
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const category = btn.dataset.category;
+
+            // Active button styling
+            filterBtns.forEach(b => {
+                b.classList.remove("bg-blue-600", "text-white");
+                b.classList.add("bg-white", "dark:bg-gray-800", "text-gray-700", "dark:text-gray-300");
+
+                if (b !== btn) {
+                    b.classList.remove("hover:bg-red-50", "dark:hover:bg-red-900/20", "hover:text-red-700", "dark:hover:text-red-400",
+                                      "hover:bg-blue-50", "dark:hover:bg-blue-900/20", "hover:text-blue-700", "dark:hover:text-blue-400",
+                                      "hover:bg-green-50", "dark:hover:bg-green-900/20", "hover:text-green-700", "dark:hover:text-green-400",
+                                      "hover:bg-purple-50", "dark:hover:bg-purple-900/20", "hover:text-purple-700", "dark:hover:text-purple-400",
+                                      "hover:bg-pink-50", "dark:hover:bg-pink-900/20", "hover:text-pink-700", "dark:hover:text-pink-400");
+                }
+            });
+
+            btn.classList.remove("bg-white", "dark:bg-gray-800", "text-gray-700", "dark:text-gray-300");
+            btn.classList.add("bg-blue-600", "text-white");
+
+            // Filter projects
+            projectCards.forEach(card => {
+                if (category === "all" || card.dataset.category === category) {
+                    card.classList.remove("hidden");
+                } else {
+                    card.classList.add("hidden");
+                }
+            });
+        });
+    });
+
+    // Form submission (only if user is admin)
+    const createProjectForm = document.getElementById("createProjectForm");
+    if (createProjectForm) {
+        createProjectForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch("/api/projects/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    closeModal('projectModal');
+                    showNotification("Project created successfully!", "success");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error("Error creating project");
+                }
+            } catch (error) {
+                showNotification("Error creating project. Please try again.", "error");
+                console.error("Error:", error);
+            }
+        });
+    }
+});
+
+// Helper functions
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

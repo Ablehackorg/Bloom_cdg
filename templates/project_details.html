@@ -1,0 +1,466 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - Bloom{% endblock %}
+
+{% block content %}
+<!-- Project Details Area -->
+<section id="trending_causes_main" class="section_padding">
+    <div class="container">
+        <div class="row" id="counter">
+            <div class="col-lg-8">
+                <div class="details_wrapper_area">
+                    <div class="details_big_img">
+                        {% if project.image %}
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                        {% else %}
+                            <img src="{% static 'img/causes/details-big.png' %}" alt="{{ project.title }}">
+                        {% endif %}
+                        <span class="causes_badge 
+                            {% if project.category == 'health' %}bg-red
+                            {% elif project.category == 'education' %}bg-yellow
+                            {% elif project.category == 'environment' %}bg-green
+                            {% elif project.category == 'innovation' %}bg-purple
+                            {% elif project.category == 'equality' %}bg-pink
+                            {% else %}bg-theme{% endif %}">
+                            {{ project.get_category_display }}
+                        </span>
+                    </div>
+                    <div class="details_skill_area">
+                        <div class="class-full causes_pro_bar_flex progress_bar">
+                            <div class="class-full-bar-box">
+                                <h3 class="h3-title">Goal: <span>${{ project.goal_amount }}</span></h3>
+                                <div class="class-full-bar-percent">
+                                    <h2><span class="counting-data" data-count="{{ project.progress|floatformat:0 }}">0</span>
+                                        <span>%</span>
+                                    </h2>
+                                </div>
+                                <div class="skill-bar class-bar" data-width="{{ project.progress }}%">
+                                    <div class="skill-bar-inner class-bar-in"></div>
+                                </div>
+                            </div>
+                            <div class="details_top_btn">
+                                {% if project.progress < 100 %}
+                                    <button onclick="openModal('donateModal')" class="btn btn_md btn_theme">Donate now</button>
+                                {% else %}
+                                    <button disabled class="btn btn_md btn_disabled">Goal Reached</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="details_text_wrapper">
+                        <h2>{{ project.title }}</h2>
+                        <p>{{ project.description }}</p>
+                        
+                        <h3>Project Impact</h3>
+                        <p>This project in {{ project.get_region_display }} region focuses on {{ project.get_category_display|lower }} and aims to make a significant positive impact in the community.</p>
+                        
+                        <ul>
+                            <li><i class="fas fa-circle"></i> Professional project management and oversight</li>
+                            <li><i class="fas fa-circle"></i> Regular progress updates and transparency</li>
+                            <li><i class="fas fa-circle"></i> Community involvement and local partnerships</li>
+                            <li><i class="fas fa-circle"></i> Sustainable long-term impact and maintenance</li>
+                        </ul>
+                        
+                        {% if project.image %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="details_small_img">
+                                    <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="details_small_img">
+                                    <img src="{% static 'img/causes/details-small-2.png' %}" alt="Project Impact">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <p>Your support helps us achieve our goals and create lasting positive change in the {{ project.get_region_display }} region. Every contribution, no matter the size, brings us closer to completing this important initiative.</p>
+                    </div>
+                    
+                    <!-- Volunteer Application Section -->
+                    {% if user.is_authenticated %}
+                    <div class="volunteer_application_area">
+                        <div class="pdf_download_left">
+                            <img src="{% static 'img/icon/volunteer.png' %}" alt="volunteer">
+                            <h4>Want to volunteer for this project?</h4>
+                        </div>
+                        <div class="pdf_download_right">
+                            {% if has_applied %}
+                                <button disabled class="btn btn_md btn_disabled">Already Applied</button>
+                            {% else %}
+                                <button onclick="openModal('volunteerModal')" class="btn btn_md btn_theme">Apply as Volunteer</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Recent Donations Comments -->
+                    <div class="comment_area_details">
+                        <h3>Recent Donations</h3>
+                        {% if project.donations.exists %}
+                        <div class="post_comment_wrapper">
+                            {% for donation in project.donations.all|slice:":3" %}
+                            <div class="post_comment_item">
+                                <div class="post_comment_img">
+                                    <img src="{% static 'img/common/donor-avatar.png' %}" alt="donor">
+                                </div>
+                                <div class="post_comment_text">
+                                    <div class="post_names_replay">
+                                        <h5>{{ donation.donor.username }}</h5>
+                                        <span class="donation_amount">${{ donation.amount }}</span>
+                                    </div>
+                                    <p>Thank you for supporting this important cause! - {{ donation.created_at|timesince }} ago</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p>No donations yet. Be the first to support this project!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar_first">
+                    <!-- Project Organizer -->
+                    <div class="project_organizer_wrapper sidebar_boxed">
+                        <div class="project_organizer_img">
+                            <img src="{% static 'img/sidebar/project_organizer.png' %}" alt="organizer" />
+                        </div>
+                        <div class="project_organizer_text">
+                            <h5>Project organizer:</h5>
+                            <h3>{{ project.created_by.username }}</h3>
+                            <p>Community Impact Coordinator</p>
+                            <ul>
+                                <li><img src="{% static 'img/icon/tag.png' %}" alt="icon"> Category: <span>{{ project.get_category_display }}</span></li>
+                                <li><img src="{% static 'img/icon/map.png' %}" alt="icon"> Location: <span>{{ project.get_region_display }}</span></li>
+                                <li><img src="{% static 'img/icon/cal.png' %}" alt="icon"> Date: <span>{{ project.created_at|date:"d M, Y" }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Donations -->
+                    <div class="project_recentdonet_wrapper sidebar_boxed">
+                        <div class="sidebar_heading_main">
+                            <h3>Recent donations</h3>
+                        </div>
+                        {% for donation in project.donations.all|slice:":5" %}
+                        <div class="recent_donet_item">
+                            <div class="recent_donet_img">
+                                <img src="{% static 'img/sidebar/rec-donet-1.png' %}" alt="donor">
+                            </div>
+                            <div class="recent_donet_text">
+                                <div class="sidebar_inner_heading">
+                                    <h4>{{ donation.donor.username }}</h4>
+                                    <h5>${{ donation.amount }}</h5>
+                                </div>
+                                <p>Supporter</p>
+                                <h6>{{ donation.created_at|timesince }} ago</h6>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No donations yet</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Volunteer Applications -->
+                    <div class="recent_causes_wrapper sidebar_boxed">
+                        <div class="sidebar_heading_main">
+                            <h3>Volunteer applications</h3>
+                        </div>
+                        {% for volunteer in project.volunteer_applications.all|slice:":4" %}
+                        <div class="recent_donet_item">
+                            <div class="recent_donet_img">
+                                <img src="{% static 'img/sidebar/rec-cas-1.png' %}" alt="volunteer">
+                            </div>
+                            <div class="recent_donet_text">
+                                <div class="sidebar_inner_heading">
+                                    <h4>{{ volunteer.volunteer.username }}</h4>
+                                </div>
+                                <p class="volunteer_status 
+                                    {% if volunteer.status == 'pending' %}text-warning
+                                    {% elif volunteer.status == 'approved' %}text-success
+                                    {% else %}text-danger{% endif %}">
+                                    {{ volunteer.status|title }}
+                                </p>
+                                <h6>{{ volunteer.created_at|date:"d M, Y" }}</h6>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No volunteers yet</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Share Project -->
+                    <div class="share_causes_wrapper sidebar_boxed">
+                        <div class="sidebar_heading_main">
+                            <h3>Share project</h3>
+                        </div>
+                        <div class="social_icon_sidebar">
+                            <ul>
+                                <li><a href="#!" onclick="shareProject('facebook')"><img src="{% static 'img/icon/facebook.png' %}" alt="Facebook"></a></li>
+                                <li><a href="#!" onclick="shareProject('twitter')"><img src="{% static 'img/icon/twitter.png' %}" alt="Twitter"></a></li>
+                                <li><a href="#!" onclick="shareProject('linkedin')"><img src="{% static 'img/icon/linkedin.png' %}" alt="LinkedIn"></a></li>
+                                <li><a href="#!" onclick="copyProjectLink()"><img src="{% static 'img/icon/link.png' %}" alt="Copy Link"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Subscribe Area -->
+<section id="subscribe_area">
+    <div class="container">
+        <div class="subscribe_wrapper">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="subscribe_text">
+                        <p>Newsletter</p>
+                        <h3>To get weekly & monthly news,
+                            <span class="color_big_heading">Subscribe</span> to our newsletter.
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="cta_right_side">
+                        <form action="#subscribe" method="post" id="subscribe_form">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="email" name="email" class="form-control" placeholder="Your mail address" required="">
+                                <button class="btn btn_theme btn_md" type="submit">Subscribe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Donation Modal -->
+<div id="donateModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Donate to {{ project.title }}</h5>
+                <button type="button" class="btn-close" onclick="closeModal('donateModal')"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Donation Amount ($)</label>
+                    <input id="donationAmount" type="number" class="form-control" placeholder="Enter amount" min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('donateModal')">Cancel</button>
+                <button type="button" class="btn btn_theme" onclick="donateProject({{ project.id }})">Confirm Donation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Volunteer Modal -->
+<div id="volunteerModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Apply as Volunteer</h5>
+                <button type="button" class="btn-close" onclick="closeModal('volunteerModal')"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Why do you want to volunteer for this project?</label>
+                    <textarea id="volunteerNote" class="form-control" rows="4" placeholder="Tell us about your motivation and skills..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('volunteerModal')">Cancel</button>
+                <button type="button" class="btn btn_theme" onclick="applyVolunteer({{ project.id }})">Submit Application</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+    document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.getElementById(id).classList.remove('show');
+}
+
+async function donateProject(id) {
+    const amount = document.getElementById("donationAmount").value;
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/projects/${id}/donate/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: JSON.stringify({ amount })
+        });
+        
+        if (res.ok) {
+            alert("Thank you for your donation!");
+            location.reload();
+        } else {
+            alert("Error processing donation. Please try again.");
+        }
+    } catch (error) {
+        alert("Error processing donation. Please try again.");
+    }
+}
+
+async function applyVolunteer(id) {
+    const note = document.getElementById("volunteerNote").value;
+    if (!note.trim()) {
+        alert("Please tell us why you want to volunteer");
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/projects/${id}/apply/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: JSON.stringify({ note })
+        });
+        
+        if (res.ok) {
+            alert("Your volunteer application has been submitted!");
+            location.reload();
+        } else {
+            alert("Error submitting application. Please try again.");
+        }
+    } catch (error) {
+        alert("Error submitting application. Please try again.");
+    }
+}
+
+function shareProject(platform) {
+    const url = window.location.href;
+    const title = "{{ project.title|escapejs }}";
+    
+    switch(platform) {
+        case 'facebook':
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            break;
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+            break;
+        case 'linkedin':
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+            break;
+    }
+}
+
+function copyProjectLink() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Project link copied to clipboard!');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-dialog {
+    max-width: 500px;
+    margin: 50px auto;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 10px;
+    padding: 0;
+}
+
+.modal-header, .modal-body, .modal-footer {
+    padding: 20px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.volunteer_application_area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.donation_amount {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.volunteer_status.text-warning { color: #ffc107 !important; }
+.volunteer_status.text-success { color: #28a745 !important; }
+.volunteer_status.text-danger { color: #dc3545 !important; }
+</style>
+{% endblock %}
